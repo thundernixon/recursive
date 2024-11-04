@@ -114,21 +114,21 @@ for glyphName in sorted(problemGlyphs):
             
         print("")
 
-    # If glyph is not in all fonts, report
-    # if len(unicodesDict[glyphName]) != len(fonts):
-    if glyphName in glyphsNotInAllFonts:
-        # print("\tGlyph is not in all fonts.\n")
-        print("\tIs in:\n\t------------------")
-        for fontName in sorted(fonts):
-            if fontName in unicodesDict[glyphName]:
-                print("\t",fontName)
+    # # If glyph is not in all fonts, report
+    # # if len(unicodesDict[glyphName]) != len(fonts):
+    # if glyphName in glyphsNotInAllFonts:
+    #     # print("\tGlyph is not in all fonts.\n")
+    #     print("\tIs in:\n\t------------------")
+    #     for fontName in sorted(fonts):
+    #         if fontName in unicodesDict[glyphName]:
+    #             print("\t",fontName)
         
-        print("\n")
+    #     print("\n")
 
-        print("\tNot in:\n\t------------------")
-        for fontName in sorted(fonts):
-            if fontName not in unicodesDict[glyphName]:
-                print("\t",fontName)
+    #     print("\tNot in:\n\t------------------")
+    #     for fontName in sorted(fonts):
+    #         if fontName not in unicodesDict[glyphName]:
+    #             print("\t",fontName)
 
 if len(glyphsWithUnevenUnicodes) >= 1:
     print("️\n\nGlyphs with unequal unicodes between fonts:\n")
