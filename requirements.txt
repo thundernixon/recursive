@@ -16,7 +16,7 @@ fontbakery
 # the designspace of Recusive. This causes no known problems
 # with afdko in our usage, as we aren't using any of the
 # afdko that uses ufoProcessor
-ufoProcessor>=1.9
+git+https://github.com/LettError/ufoProcessor
 git+https://github.com/LettError/DesignspaceProblems
 
 # to run drawbot proofs

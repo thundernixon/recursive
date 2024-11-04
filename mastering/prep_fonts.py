@@ -64,8 +64,7 @@ def copyFiles(designspacePath, outRoot):
         raise ValueError
     os.mkdir(outRoot)
 
-    newDesignspacePath = os.path.join(outRoot,
-                                      os.path.split(designspacePath)[1])
+    newDesignspacePath = os.path.join(outRoot, os.path.split(designspacePath)[1])
 
     shutil.copy(designspacePath, newDesignspacePath)
 
@@ -190,8 +189,9 @@ def clearGuides(font):
             glyph.clearGuidelines()
             clearedGlyphs.append(glyph.name)
 
-    local_report.append((font.info.familyName + " " + font.info.styleName,
-                         clearedGlyphs))
+    local_report.append(
+        (font.info.familyName + " " + font.info.styleName, clearedGlyphs)
+    )
     report["Clear Guidelines"] = local_report
 
 
@@ -218,8 +218,9 @@ def makeSourceFontsGlyphCompatible(fonts):
                 removed.append(name)
         if len(removed) != 0:
             removeGlyphs(font, removed)
-            local_report.append((font.info.familyName + " " + font.info.styleName,
-                                 removed))
+            local_report.append(
+                (font.info.familyName + " " + font.info.styleName, removed)
+            )
     report["Removed Glyphs"] = local_report
 
 
@@ -246,7 +247,9 @@ def decomposeNonExportingGlyphs(fonts):
         # add glyphs from lib.skipExportGlyphs
         non_exporting.extend(font.lib["public.skipExportGlyphs"])
         removeGlyphs(font, non_exporting)
-        local_report.append((font.info.familyName + " " + font.info.styleName, non_exporting))
+        local_report.append(
+            (font.info.familyName + " " + font.info.styleName, non_exporting)
+        )
     report["Non-exporting glyphs"] = local_report
 
 
@@ -259,7 +262,6 @@ def decomposeScaledNested(fonts):
 
     local_report = report.get("Decomposed scaled, flipped, and nested components", [])
     for font in fonts:
-
         changed_glyphs = []
 
         for glyph in font:
@@ -284,7 +286,9 @@ def decomposeScaledNested(fonts):
                     changed_glyphs.append(glyph.name)
 
         if len(changed_glyphs) != 0:
-            local_report.append((font.info.familyName + " " + font.info.styleName, changed_glyphs))
+            local_report.append(
+                (font.info.familyName + " " + font.info.styleName, changed_glyphs)
+            )
 
     report["Decomposed scaled, flipped, and nested components"] = local_report
 
@@ -296,7 +300,12 @@ def sortGlyphOrder(fonts):
     *fonts* is a `list` of font objects (Defcon or FontParts).
     """
     for font in fonts:
-        newGlyphOrder = font.naked().unicodeData.sortGlyphNames(font.glyphOrder, sortDescriptors=[dict(type="cannedDesign", ascending=True, allowPseudoUnicode=True)])
+        newGlyphOrder = font.naked().unicodeData.sortGlyphNames(
+            font.glyphOrder,
+            sortDescriptors=[
+                dict(type="cannedDesign", ascending=True, allowPseudoUnicode=True)
+            ],
+        )
 
         # Trick here to put the .notdef first, as the cannedDesign sort puts it
         # last, and it must be the first glyph in a font.
@@ -345,16 +354,16 @@ def checkName(name, mapping):
     *mapping* is a `dictionary` of glyph name to final names, both `string`s
     """
 
-    if len(name.split('.')) == 2:
-        n, ext = name.split('.')
+    if len(name.split(".")) == 2:
+        n, ext = name.split(".")
         n = checkName(n, mapping)
         return f"{n}.{ext}"
-    elif len(name.split('.')) > 2:
-        r = name.split('.')
+    elif len(name.split(".")) > 2:
+        r = name.split(".")
         n = checkName(r[0], mapping)
         return f"{n}.{'_'.join(r[1:])}"
-    elif len(name.split('_')) == 2:
-        n, ext = name.split('_')
+    elif len(name.split("_")) == 2:
+        n, ext = name.split("_")
         n = checkName(n, mapping)
         ext = checkName(ext, mapping)
         return f"{n}_{ext}"
@@ -373,86 +382,86 @@ def setProductionNames(fonts):
     """
 
     mapping = {
-                'acutecomb': 'uni0301',
-                'arrowleft': 'uni2190',
-                'arrowright': 'uni2192',
-                'brevecomb': 'uni0306',
-                'caroncomb': 'uni030C',
-                'cedillacomb': 'uni0327',
-                'circumflexcomb': 'uni0302',
-                'commaaboverightcomb': 'uni0315',
-                'commaaccentcomb': 'uni0326',
-                'commaturnedabovecomb': 'uni0312',
-                'dieresiscomb': 'uni0308',
-                'dotaccentcomb': 'uni0307',
-                'dotbelowcomb': 'uni0323',
-                'florin': 'uni0192',
-                'f_f': 'f_f',
-                'f_f_i': 'f_f_i',
-                'f_f_l': 'f_f_l',
-                'gravecomb': 'uni0300',
-                'hungarumlautcomb': 'uni030B',
-                'macroncomb': 'uni0304',
-                'minute': 'uni2032',
-                'ogonekcomb': 'uni0328',
-                'ringcomb': 'uni030A',
-                'Scedilla': 'uni015E',
-                'scedilla': 'uni015F',
-                'second': 'uni2033',
-                'slashcomb': 'uni0337',
-                'tildecomb': 'uni0303',
-                'mu.math': 'uni00B5',
-                "Delta": "uni0394",
-                "mu": "uni03BC",
-                # the following abbreviations are to keep code ligature glyph names under 31 characters,
-                # per FontBakery check: com.google.fonts/check/valid_glyphnames
-                # (generated with src/01-shell-scripts-for-sources/font-info/shorten-long-glyph-names.py)
-                'numbersign_numbersign_numbersign.code': 'num_num_num.code',
-                'quotesingle.code': 'qutsng.code',
-                'hyphen_space_bracketleft_space_bracketright.code': 'hyphen_space_brktleft_space_brktright.code',
-                'hyphen_space_brktleft_space_brktright.code': 'hyphen_space_brktlf_space_brktright.code',
-                'hyphen_space_brktlf_space_brktright.code': 'hyphen_space_brktlf_space_brktrt.code',
-                'hyphen_space_brktlf_space_brktrt.code': 'hyphen_spc_brktlf_spc_brktrt.code',
-                'asterisk_equal.code': 'astr_equal.code',
-                'asterisk_slash.code': 'astr_slash.code',
-                'question_period.code': 'qust_period.code',
-                'bracketright_bracketright.code': 'brktright_brktright.code',
-                'brktright_brktright.code': 'brktrt_brktrt.code',
-                'question_colon.code': 'qust_colon.code',
-                'question_question.code': 'qust_qust.code',
-                'bracketleft_parenleft.code': 'brktleft_parenleft.code',
-                'brktleft_parenleft.code': 'brktlf_parenlf.code',
-                'quotesingle_quotesingle_quotesingle.code': 'qutsng_qutsng_qutsng.code',
-                'quotedbl.code': 'qutdbl.code',
-                'asterisk_asterisk_asterisk.code': 'astr_astr_astr.code',
-                'dollar_braceleft.code': 'dollar_bracelf.code',
-                'bracketright_braceright.code': 'brktright_braceright.code',
-                'brktright_braceright.code': 'brktrt_bracert.code',
-                'braceleft_bracketleft.code': 'braceleft_brktleft.code',
-                'braceleft_brktleft.code': 'bracelf_brktlf.code',
-                'ampersand_ampersand_ampersand.code': 'and_and_and.code',
-                'asterisk.code': 'astr.code',
-                'numbersign.code': 'num.code',
-                'quotedbl_quotedbl_quotedbl.code': 'qutdbl_qutdbl_qutdbl.code',
-                'numbersign_numbersign.code': 'num_num.code',
-                'f_quotesingle.code': 'f_qutsng.code',
-                'braceleft_parenleft.code': 'bracelf_parenlf.code',
-                'slash_asterisk.code': 'slash_astr.code',
-                'parenright_bracketright.code': 'parenright_brktright.code',
-                'parenright_brktright.code': 'parenrt_brktrt.code',
-                'parenright_parenright.code': 'parenrt_parenrt.code',
-                'parenright_braceright.code': 'parenrt_bracert.code',
-                'bracketleft_bracketleft.code': 'brktleft_brktleft.code',
-                'brktleft_brktleft.code': 'brktlf_brktlf.code',
-                'asterisk_asterisk.code': 'astr_astr.code',
-                'numbersign_numbersign_numbersign_numbersign.code': 'num_num_num_num.code',
-                'hyphen_space_bracketleft_x_bracketright.code': 'hyphen_space_brktleft_x_brktright.code',
-                'hyphen_space_brktleft_x_brktright.code': 'hyphen_space_brktlf_x_brktright.code',
-                'hyphen_space_brktlf_x_brktright.code': 'hyphen_space_brktlf_x_brktrt.code',
-                'hyphen_space_brktlf_x_brktrt.code': 'hyphen_spc_brktlf_x_brktrt.code',
-                'parenleft_parenleft.code': 'parenlf_parenlf.code',
-                'ampersand_ampersand.code': 'and_and.code',
-               }
+        "acutecomb": "uni0301",
+        "arrowleft": "uni2190",
+        "arrowright": "uni2192",
+        "brevecomb": "uni0306",
+        "caroncomb": "uni030C",
+        "cedillacomb": "uni0327",
+        "circumflexcomb": "uni0302",
+        "commaaboverightcomb": "uni0315",
+        "commaaccentcomb": "uni0326",
+        "commaturnedabovecomb": "uni0312",
+        "dieresiscomb": "uni0308",
+        "dotaccentcomb": "uni0307",
+        "dotbelowcomb": "uni0323",
+        "florin": "uni0192",
+        "f_f": "f_f",
+        "f_f_i": "f_f_i",
+        "f_f_l": "f_f_l",
+        "gravecomb": "uni0300",
+        "hungarumlautcomb": "uni030B",
+        "macroncomb": "uni0304",
+        "minute": "uni2032",
+        "ogonekcomb": "uni0328",
+        "ringcomb": "uni030A",
+        "Scedilla": "uni015E",
+        "scedilla": "uni015F",
+        "second": "uni2033",
+        "slashcomb": "uni0337",
+        "tildecomb": "uni0303",
+        "mu.math": "uni00B5",
+        "Delta": "uni0394",
+        "mu": "uni03BC",
+        # the following abbreviations are to keep code ligature glyph names under 31 characters,
+        # per FontBakery check: com.google.fonts/check/valid_glyphnames
+        # (generated with src/01-shell-scripts-for-sources/font-info/shorten-long-glyph-names.py)
+        "numbersign_numbersign_numbersign.code": "num_num_num.code",
+        "quotesingle.code": "qutsng.code",
+        "hyphen_space_bracketleft_space_bracketright.code": "hyphen_space_brktleft_space_brktright.code",
+        "hyphen_space_brktleft_space_brktright.code": "hyphen_space_brktlf_space_brktright.code",
+        "hyphen_space_brktlf_space_brktright.code": "hyphen_space_brktlf_space_brktrt.code",
+        "hyphen_space_brktlf_space_brktrt.code": "hyphen_spc_brktlf_spc_brktrt.code",
+        "asterisk_equal.code": "astr_equal.code",
+        "asterisk_slash.code": "astr_slash.code",
+        "question_period.code": "qust_period.code",
+        "bracketright_bracketright.code": "brktright_brktright.code",
+        "brktright_brktright.code": "brktrt_brktrt.code",
+        "question_colon.code": "qust_colon.code",
+        "question_question.code": "qust_qust.code",
+        "bracketleft_parenleft.code": "brktleft_parenleft.code",
+        "brktleft_parenleft.code": "brktlf_parenlf.code",
+        "quotesingle_quotesingle_quotesingle.code": "qutsng_qutsng_qutsng.code",
+        "quotedbl.code": "qutdbl.code",
+        "asterisk_asterisk_asterisk.code": "astr_astr_astr.code",
+        "dollar_braceleft.code": "dollar_bracelf.code",
+        "bracketright_braceright.code": "brktright_braceright.code",
+        "brktright_braceright.code": "brktrt_bracert.code",
+        "braceleft_bracketleft.code": "braceleft_brktleft.code",
+        "braceleft_brktleft.code": "bracelf_brktlf.code",
+        "ampersand_ampersand_ampersand.code": "and_and_and.code",
+        "asterisk.code": "astr.code",
+        "numbersign.code": "num.code",
+        "quotedbl_quotedbl_quotedbl.code": "qutdbl_qutdbl_qutdbl.code",
+        "numbersign_numbersign.code": "num_num.code",
+        "f_quotesingle.code": "f_qutsng.code",
+        "braceleft_parenleft.code": "bracelf_parenlf.code",
+        "slash_asterisk.code": "slash_astr.code",
+        "parenright_bracketright.code": "parenright_brktright.code",
+        "parenright_brktright.code": "parenrt_brktrt.code",
+        "parenright_parenright.code": "parenrt_parenrt.code",
+        "parenright_braceright.code": "parenrt_bracert.code",
+        "bracketleft_bracketleft.code": "brktleft_brktleft.code",
+        "brktleft_brktleft.code": "brktlf_brktlf.code",
+        "asterisk_asterisk.code": "astr_astr.code",
+        "numbersign_numbersign_numbersign_numbersign.code": "num_num_num_num.code",
+        "hyphen_space_bracketleft_x_bracketright.code": "hyphen_space_brktleft_x_brktright.code",
+        "hyphen_space_brktleft_x_brktright.code": "hyphen_space_brktlf_x_brktright.code",
+        "hyphen_space_brktlf_x_brktright.code": "hyphen_space_brktlf_x_brktrt.code",
+        "hyphen_space_brktlf_x_brktrt.code": "hyphen_spc_brktlf_x_brktrt.code",
+        "parenleft_parenleft.code": "parenlf_parenlf.code",
+        "ampersand_ampersand.code": "and_and.code",
+    }
     names = []
 
     for font in fonts:
@@ -487,6 +496,9 @@ def kerningCompatibility(fonts):
     for font in fonts:
         if len(font.kerning) == 0:
             font.kerning[("A", "A")] = 0
+            font.kerning[
+                ("pi", "pi")
+            ] = 0  # add separate Greek kerning (https://github.com/googlefonts/fontmake/issues/894#issuecomment-1493933753)
             local_report.append(font.info.familyName + " " + font.info.styleName)
     report["Added blank kerning"] = local_report
 
@@ -583,16 +595,17 @@ def prep(designspacePath, version):
     report["Designspace check"] = dsc.problems
 
     print("🏗  Writing report")
-    report_path = os.path.join(os.path.split(designspacePath)[0],
-                               "varfontprep-report.txt")
+    report_path = os.path.join(
+        os.path.split(designspacePath)[0], "varfontprep-report.txt"
+    )
     writeReport(report_path)
 
     print("✅ Done preparing sources")
 
 
 if __name__ == "__main__":
-
     import argparse
+
     description = """
     Prepares the sources of a designspace for building a variable font.
 
@@ -600,12 +613,14 @@ if __name__ == "__main__":
     working files are never overwritten. This may be overridden.
     """
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("designspacePath",
-                        help="The path to a designspace file")
-    parser.add_argument("-o", "--overwrite", action="store_true",
-                        help="Overwrite source files in place.")
-    parser.add_argument("-v", "--version",
-                        help="Version to set in files")
+    parser.add_argument("designspacePath", help="The path to a designspace file")
+    parser.add_argument(
+        "-o",
+        "--overwrite",
+        action="store_true",
+        help="Overwrite source files in place.",
+    )
+    parser.add_argument("-v", "--version", help="Version to set in files")
     args = parser.parse_args()
     designspacePath = args.designspacePath
 
